@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>iPhone Pro Calculator</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#000;
+  font-family:Arial;
+  transition:0.3s;
+}
+
+/* 🌙 LIGHT MODE */
+body.light{
+  background:#f2f2f7;
+}
+
+.calculator{
+  width:340px;
+  border-radius:35px;
+  padding:20px;
+  background:#000;
+  box-shadow:0 25px 70px rgba(0,0,0,0.6);
+  transition:0.3s;
+}
+
+body.light .calculator{
+  background:white;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.title{
+  color:white;
+  font-weight:bold;
+}
+
+body.light .title{
+  color:black;
+}
+
+.toggle{
+  background:#333;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+body.light .toggle{
+  background:#ddd;
+  color:black;
+}
+
+.history{
+  color:#888;
+  font-size:14px;
+  text-align:right;
+  height:70px;
+  overflow:auto;
+  margin-bottom:10px;
+}
+
+.display{
+  color:white;
+  font-size:45px;
+  text-align:right;
+  min-height:70px;
+  padding:10px;
+  transition:0.2s;
+}
+
+body.light .display{
+  color:black;
+}
+
+.buttons{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+button{
+  height:70px;
+  font-size:22px;
+  border:none;
+  border-radius:50%;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+button:active{
+  transform:scale(0.88);
+}
+
+.num{background:#333;color:white;}
+body.light .num{background:#ddd;color:black;}
+
+.op{background:#ff9f0a;color:white;}
+.special{background:#a5a5a5;color:black;}
+
+.zero{grid-column:span 2;border-radius:40px;}
+
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+  <div class="top">
+    <div class="title">بامكانك تغير وضع الى ليلي او نهار </div>
+    <button class="toggle" onclick="toggleMode()">🌙/☀️</button>
+  </div>
+
+  <div class="history" id="history"></div>
+  <div class="display" id="display">0</div>
+
+  <div class="buttons">
+
+    <button class="special" onclick="clearAll()">AC</button>
+    <button class="special" onclick="backspace()">⌫</button>
+    <button class="op" onclick="append('/')">÷</button>
+    <button class="op" onclick="append('*')">×</button>
+
+    <button class="num" onclick="append('7')">7</button>
+    <button class="num" onclick="append('8')">8</button>
+    <button class="num" onclick="append('9')">9</button>
+    <button class="op" onclick="append('-')">−</button>
+
+    <button class="num" onclick="append('4')">4</button>
+    <button class="num" onclick="append('5')">5</button>
+    <button class="num" onclick="append('6')">6</button>
+    <button class="op" onclick="append('+')">+</button>
+
+    <button class="num" onclick="append('1')">1</button>
+    <button class="num" onclick="append('2')">2</button>
+    <button class="num" onclick="append('3')">3</button>
+    <button class="op" onclick="calculate()">=</button>
+
+    <button class="num zero" onclick="append('0')">0</button>
+    <button class="num" onclick="append('.')">.</button>
+
+  </div>
+
+</div>
+
+<!-- 🔊 sound -->
+<audio id="clickSound">
+  <source src="https://www.soundjay.com/button/sounds/button-16.mp3">
+</audio>
+
+<script>
+
+let display = document.getElementById("display");
+let history = document.getElementById("history");
+let sound = document.getElementById("clickSound");
+
+let current = "";
+
+/* 💾 LOAD HISTORY */
+history.innerHTML = localStorage.getItem("calcHistory") || "";
+
+function saveHistory(){
+  localStorage.setItem("calcHistory", history.innerHTML);
+}
+
+/* 🔊 SOUND */
+function clickFX(){
+  sound.currentTime = 0;
+  sound.play();
+}
+
+/* ➕ input */
+function append(val){
+  clickFX();
+  if(display.innerText === "0") current = "";
+  current += val;
+  display.innerText = current;
+}
+
+/* ❌ clear */
+function clearAll(){
+  clickFX();
+  current = "";
+  display.innerText = "0";
+}
+
+/* ⌫ back */
+function backspace(){
+  clickFX();
+  current = current.slice(0,-1);
+  display.innerText = current || "0";
+}
+
+/* = */
+function calculate(){
+  clickFX();
+  try{
+    let result = eval(current);
+    history.innerHTML += `${current} = ${result}<br>`;
+    saveHistory();
+
+    current = result.toString();
+    display.innerText = current;
+  }catch{
+    display.innerText = "Error";
+    current = "";
+  }
+}
+
+/* 🌙 LIGHT MODE */
+function toggleMode(){
+  document.body.classList.toggle("light");
+}
+
+</script>
+
+</body>
+</html>
